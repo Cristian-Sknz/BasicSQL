@@ -1,0 +1,26 @@
+plugins {
+    id 'java-library'
+}
+
+group 'me.skiincraft'
+version '1.0-SNAPSHOT'
+
+compileJava.options.encoding('UTF-8')
+tasks.withType(JavaCompile) {
+    options.encoding('UTF-8')
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.18'
+    compile group: 'com.google.guava', name: 'guava', version: '29.0-jre'
+    testImplementation(platform('org.junit:junit-bom:5.7.0'))
+    testImplementation('org.junit.jupiter:junit-jupiter')
+}
+
+test {
+    useJUnitPlatform()
+}
