@@ -21,7 +21,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public abstract class BasicRepository<T, ID> implements Repository<T, ID>, UseStatement {
+public abstract class BasicRepository<T, ID> implements Repository<T, ID> {
 
     private String tableName;
     private Field idField;
