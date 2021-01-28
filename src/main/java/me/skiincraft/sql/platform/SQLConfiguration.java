@@ -67,7 +67,18 @@ public class SQLConfiguration {
     public static SQLConfiguration getPostgresConfig(){
         return new SQLConfiguration()
                 .setDriver("org.postgresql.Driver")
-                .setHost("jdbc:postgresql://localhost:5432/")
+                .setHost("jdbc:postgresql://")
                 .setDatabase("postgres");
+    }
+
+    @Override
+    public String toString() {
+        return "SQLConfiguration{" +
+                "driver='" + driver + '\'' +
+                ", host='" + host + '\'' +
+                ", user='" + user + '\'' +
+                ", password='" + password + '\'' +
+                ", database='" + database + '\'' +
+                '}';
     }
 }

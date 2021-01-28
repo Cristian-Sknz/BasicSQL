@@ -1,4 +1,4 @@
-package me.skiincraft.sql.util;
+package me.skiincraft.sql.reflection;
 
 import com.google.common.reflect.TypeToken;
 
@@ -39,9 +39,7 @@ public class ClassUtils<T> {
     }
 
     public <A extends Annotation> List<Field> getFieldsWithAnnotation(Class<A> annotation){
-        return Arrays.stream(getGenericClass().getDeclaredFields()).filter(field ->{
-           return field.isAnnotationPresent(annotation);
-        }).collect(Collectors.toList());
+        return Arrays.stream(getGenericClass().getDeclaredFields()).filter(field -> field.isAnnotationPresent(annotation)).collect(Collectors.toList());
     }
 
     public <A extends Annotation> List<Method> getMethodsWithAnnotation(Class<A> annotation){

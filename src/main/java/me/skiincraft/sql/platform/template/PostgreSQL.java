@@ -24,6 +24,11 @@ public class PostgreSQL extends SQLPlatform {
     }
 
     @Override
+    public PreparedStatement createNewPreparedStatement(String sql, UseStatement useSQL) throws SQLException {
+        return getStatementUpdater().getStatement(sql, useSQL);
+    }
+
+    @Override
     public boolean connect() throws SQLException {
         try {
             if (this.connection != null) {

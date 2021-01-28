@@ -2,15 +2,15 @@ package me.skiincraft.sql;
 
 import me.skiincraft.sql.exceptions.RepositoryException;
 import me.skiincraft.sql.platform.SQLPlatform;
-import me.skiincraft.sql.repository.Repository;
+import me.skiincraft.sql.reflection.ProxyHandler;
 import me.skiincraft.sql.repository.BasicRepository;
+import me.skiincraft.sql.repository.Repository;
 
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class BasicSQL {
@@ -22,22 +22,32 @@ public class BasicSQL {
     private BasicSQL() {
     }
 
-    public <E extends Repository<T, ID>, T, ID> Repository<T, ID> registerRepository(Class<E> repositoryClass) throws RepositoryException {
-        List<Type> types = new ArrayList<>();
+    public <E extends Repository<T, ID>, T, ID> E registerRepository(Class<E> repositoryClass) throws RepositoryException {
+        if (!repositoryClass.isInterface()){
+            throw new RepositoryException("Você só pode registrar interfaces!");
+        }
+        Type[] types = null;
         for (Type genericInterface : repositoryClass.getGenericInterfaces()) {
             if (genericInterface instanceof ParameterizedType) {
-                Type[] genericTypes = ((ParameterizedType) genericInterface).getActualTypeArguments();
-                types.add(genericTypes[0]);
-                types.add(genericTypes[1]);
+                types = ((ParameterizedType) genericInterface).getActualTypeArguments();
             }
         }
-        if (repositories.containsKey(types.get(0))) {
-            return (Repository<T, ID>) repositories.get(types.get(0));
+        if (types == null){
+            throw new RepositoryException("Os parâmetros genéricos não estão preenchidos corretamente.");
         }
-        Repository<T, ID> repository = new BasicRepository<T, ID>((Class<T>) types.get(0), (Class<ID>) types.get(1)) {};
-        repositories.put(types.get(0), repository);
+
+        if (repositories.containsKey(types[0])) {
+            return (E) repositories.get(types[0]);
+        }
+        E repository = (E) createNewInstance(repositoryClass, (Class<T>) types[0], (Class<ID>) types[1]);
+        repositories.put(types[0], repository);
 
         return repository;
+    }
+
+    private <E extends Repository<T, ID>, T, ID> Object createNewInstance(Class<E> type, Class<T> t1, Class<ID> id) throws RepositoryException {
+        Repository<T, ID> repository = new BasicRepository<>(t1, id);
+        return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class<?>[]{type}, new ProxyHandler<>(repository, type));
     }
 
 
